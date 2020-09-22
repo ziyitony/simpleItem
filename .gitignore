@@ -1,0 +1,8 @@
+coverage.txt
+.env
+vendor/
+bin/
+.circleci/local.yml
+.idea/
+/server*
+docker-compose.override.yaml
