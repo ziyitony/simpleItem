@@ -105,5 +105,5 @@ func getUserById(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	http.Error(w, "no such user", http.StatusBadRequest)
 }
