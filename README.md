@@ -1,4 +1,4 @@
-Here are 2 HTTP services in master branch: itemService and userService.
+Here are 2 HTTP services to build a monolith service: itemService and userService.
 
 # itemService
 
@@ -19,3 +19,13 @@ Here are 2 HTTP services in master branch: itemService and userService.
   * get the user by id
 * POST /item
   * insert a new user into mock database, userID is not needed
+
+# how to run in docker
+
+* build the image
+
+_$ docker build -t simple-service ._
+
+* use the image to run
+
+_$ docker run -p 12345:12345 simple-service_
