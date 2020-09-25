@@ -4,10 +4,10 @@
   * a hello message of user
 * GET /users
   * list all the users in the mock database
+* POST /users
+  * insert a new user into mock database, userID is not needed
 * GET /userid/{id}
   * get the user by id
-* POST /item
-  * insert a new user into mock database, userID is not needed
 
 # how to run in docker
 

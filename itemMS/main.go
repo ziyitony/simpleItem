@@ -4,8 +4,7 @@ import "net/http"
 
 func main() {
 	http.HandleFunc("/helloitem", helloItem)
-	http.HandleFunc("/item", createItem)
-	http.HandleFunc("/items", listItems)
+	http.HandleFunc("/items", listOrCreateItem)
 
 	http.ListenAndServe(":55555", nil)
 }

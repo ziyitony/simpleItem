@@ -7,6 +7,8 @@ import (
 	"sync"
 )
 
+const maxLength = 1000
+
 type Item struct {
 	Id       string  `json:"id"`
 	Name     string  `json:"name"`
@@ -49,45 +51,40 @@ func helloItem(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`{"hello":"item"}`))
 }
 
-func createItem(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "only POST method is allowed", http.StatusBadRequest)
-		return
-	}
+func listOrCreateItem(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodPost:
+		var item Item
+		if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 
-	var item Item
-	if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+		itemMutex.Lock()
+		defer itemMutex.Unlock()
 
-	itemMutex.Lock()
-	defer itemMutex.Unlock()
-
-	if item.Id == "" {
+		if len(itemDB) >= maxLength-1 {
+			http.Error(w, "database is full", http.StatusInternalServerError)
+			return
+		}
 		item.Id = fmt.Sprintf("m%03d", len(itemDB)+1)
+		itemDB = append(itemDB, &item)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"result":"succeed"}`))
+	case http.MethodGet:
+		itemMutex.Lock()
+		defer itemMutex.Unlock()
+
+		data, err := json.Marshal(itemDB)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInsufficientStorage)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(data)
+	default:
+		http.Error(w, "unsupported HTTP method", http.StatusMethodNotAllowed)
 	}
-	itemDB = append(itemDB, &item)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(`{"result":"succeed"}`))
-}
-
-func listItems(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "only GET method is allowed", http.StatusBadRequest)
-		return
-	}
-
-	itemMutex.Lock()
-	defer itemMutex.Unlock()
-
-	data, err := json.Marshal(itemDB)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(data)
 }

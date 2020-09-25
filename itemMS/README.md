@@ -4,7 +4,7 @@
   * a hello message of item
 * GET /items
   * list all the items in the mock database
-* POST /item
+* POST /items
   * insert a new item into mock database, itemID is not needed
 
 # how to run in docker
