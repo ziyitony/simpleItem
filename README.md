@@ -15,7 +15,7 @@ Here are 2 HTTP services to build a monolith service: itemService and userServic
   * a hello message of user
 * GET /users
   * list all the users in the mock database
-* POST /items
+* POST /users
   * insert a new user into mock database, userID is not needed
 * GET /userid/{id}
   * get the user by id
