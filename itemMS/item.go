@@ -110,8 +110,8 @@ func listItemDetail(w http.ResponseWriter, r *http.Request) {
 	for i, item := range itemDB {
 		// HTTP get /userid/{id}
 		// user := getUserByIdLocally(item.SellerId)
-		fmt.Println("http://172.17.0.4:44444/userid/" + item.SellerId)
-		resp, err := http.Get("http://172.17.0.4:44444/userid/" + item.SellerId)
+		fmt.Println("http://172.18.0.2:44444/userid/" + item.SellerId)
+		resp, err := http.Get("http://172.18.0.2:44444/userid/" + item.SellerId)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInsufficientStorage)
 			return
