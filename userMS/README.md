@@ -17,4 +17,4 @@ _$ docker build -t simple-user-ms ._
 
 * use the image to run
 
-_$ docker run -p 44444:44444 simple-user-ms_
+_$ docker run -d -p 44444:44444 --name simple-user-ms simple-user-ms_

@@ -5,41 +5,37 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
+
+	"github.com/ziyitony/simpleItem/domain"
 )
 
 const maxLength = 1000
 
-type User struct {
-	Id       string `json:"id"`
-	Nickname string `json:"nickname"`
-	Address  string `json:"address"`
-}
-
 var (
 	userMutex sync.Mutex
-	userDB    []*User
+	userDB    []*domain.User
 )
 
 func init() {
-	user1 := &User{
+	user1 := &domain.User{
 		Id:       "u001",
 		Nickname: "nico",
 		Address:  "yokohama",
 	}
 
-	user2 := &User{
+	user2 := &domain.User{
 		Id:       "u002",
 		Nickname: "tony",
 		Address:  "tokyo",
 	}
 
-	user3 := &User{
+	user3 := &domain.User{
 		Id:       "u003",
 		Nickname: "gogo",
 		Address:  "chugoku",
 	}
 
-	userDB = []*User{user1, user2, user3}
+	userDB = []*domain.User{user1, user2, user3}
 }
 
 func helloUser(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +46,7 @@ func helloUser(w http.ResponseWriter, r *http.Request) {
 func listOrCreateUser(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
-		var user User
+		var user domain.User
 		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return

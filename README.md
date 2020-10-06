@@ -28,4 +28,4 @@ _$ docker build -t simple-service ._
 
 * use the image to run
 
-_$ docker run -p 12345:12345 simple-service_
+_$ docker run -d -p 12345:12345 --name simple-service simple-service_

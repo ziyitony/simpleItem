@@ -5,43 +5,38 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
-)
 
-type Item struct {
-	Id       string  `json:"id"`
-	Name     string  `json:"name"`
-	Price    float64 `json:"price"`
-	SellerId string  `json:"seller_id"`
-}
+	"github.com/ziyitony/simpleItem/domain"
+)
 
 var (
 	itemMutex sync.Mutex
-	itemDB    []*Item
+	itemDB    []*domain.Item
 )
 
 func init() {
-	item1 := &Item{
+	item1 := &domain.Item{
 		Id:       "m001",
 		Name:     "iphone",
 		Price:    50000,
 		SellerId: "u001",
 	}
 
-	item2 := &Item{
+	item2 := &domain.Item{
 		Id:       "m002",
 		Name:     "t-shirt",
 		Price:    2000,
 		SellerId: "u002",
 	}
 
-	item3 := &Item{
+	item3 := &domain.Item{
 		Id:       "m003",
 		Name:     "sofa",
 		Price:    30000,
 		SellerId: "u003",
 	}
 
-	itemDB = []*Item{item1, item2, item3}
+	itemDB = []*domain.Item{item1, item2, item3}
 }
 
 func helloItem(w http.ResponseWriter, r *http.Request) {
@@ -52,7 +47,7 @@ func helloItem(w http.ResponseWriter, r *http.Request) {
 func listOrCreateItem(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
-		var item Item
+		var item domain.Item
 		if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -86,3 +81,6 @@ func listOrCreateItem(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "unsupported HTTP method", http.StatusMethodNotAllowed)
 	}
 }
+
+// return domain.ItemDetail as the response
+func getItemDetail(w http.ResponseWriter, r *http.Request) {}
