@@ -14,6 +14,13 @@ type Item struct {
 	SellerId string  `json:"seller_id"`
 }
 
+type ItemDetail struct {
+	Id     string  `json:"id"`
+	Name   string  `json:"name"`
+	Price  float64 `json:"price"`
+	Seller User    `json:"seller"`
+}
+
 var (
 	itemMutex sync.Mutex
 	itemDB    []*Item
@@ -85,4 +92,29 @@ func listOrCreateItem(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.Error(w, "unsupported HTTP method", http.StatusMethodNotAllowed)
 	}
+}
+
+func listItemDetail(w http.ResponseWriter, r *http.Request) {
+	itemMutex.Lock()
+	defer itemMutex.Unlock()
+
+	itemDetails := make([]*ItemDetail, len(itemDB))
+	for i, item := range itemDB {
+		user := getUserByIdLocally(item.SellerId)
+		itemDetails[i] = &ItemDetail{
+			Id:     item.Id,
+			Name:   item.Name,
+			Price:  item.Price,
+			Seller: *user,
+		}
+	}
+
+	data, err := json.Marshal(itemDetails)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInsufficientStorage)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
 }

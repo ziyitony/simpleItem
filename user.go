@@ -102,3 +102,15 @@ func getUserById(w http.ResponseWriter, r *http.Request) {
 
 	http.Error(w, "no such user", http.StatusBadRequest)
 }
+
+func getUserByIdLocally(userID string) *User {
+	userMutex.Lock()
+	defer userMutex.Unlock()
+
+	for _, user := range userDB {
+		if user.Id == userID {
+			return user
+		}
+	}
+	return nil
+}

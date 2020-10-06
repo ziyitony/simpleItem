@@ -16,6 +16,19 @@ type Item struct {
 	SellerId string  `json:"seller_id"`
 }
 
+type User struct {
+	Id       string `json:"id"`
+	Nickname string `json:"nickname"`
+	Address  string `json:"address"`
+}
+
+type ItemDetail struct {
+	Id     string  `json:"id"`
+	Name   string  `json:"name"`
+	Price  float64 `json:"price"`
+	Seller User    `json:"seller"`
+}
+
 var (
 	itemMutex sync.Mutex
 	itemDB    []*Item
@@ -87,4 +100,46 @@ func listOrCreateItem(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.Error(w, "unsupported HTTP method", http.StatusMethodNotAllowed)
 	}
+}
+
+func listItemDetail(w http.ResponseWriter, r *http.Request) {
+	itemMutex.Lock()
+	defer itemMutex.Unlock()
+
+	itemDetails := make([]*ItemDetail, len(itemDB))
+	for i, item := range itemDB {
+		// HTTP get /userid/{id}
+		// user := getUserByIdLocally(item.SellerId)
+		fmt.Println("http://172.17.0.4:44444/userid/" + item.SellerId)
+		resp, err := http.Get("http://172.17.0.4:44444/userid/" + item.SellerId)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInsufficientStorage)
+			return
+		}
+		defer resp.Body.Close()
+
+		fmt.Println(resp.Body)
+		var user *User
+		err = json.NewDecoder(resp.Body).Decode(user)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInsufficientStorage)
+			return
+		}
+
+		itemDetails[i] = &ItemDetail{
+			Id:     item.Id,
+			Name:   item.Name,
+			Price:  item.Price,
+			Seller: *user,
+		}
+	}
+
+	data, err := json.Marshal(itemDetails)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInsufficientStorage)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
 }
