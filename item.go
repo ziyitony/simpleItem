@@ -83,4 +83,36 @@ func listOrCreateItem(w http.ResponseWriter, r *http.Request) {
 }
 
 // return domain.ItemDetail as the response
-func getItemDetail(w http.ResponseWriter, r *http.Request) {}
+func getItemDetail(w http.ResponseWriter, r *http.Request) {
+	itemMutex.Lock()
+	defer itemMutex.Unlock()
+
+	itemdetails := make([]*domain.ItemDetail, len(itemDB))
+	// loop item DB
+	for i, item := range itemDB {
+		user := getUserByIdLocally(item.SellerId)
+		if user == nil {
+			// return error
+			http.Error(w, "no such seller", http.StatusInternalServerError)
+			return
+		}
+		detail := &domain.ItemDetail{
+			Id:    item.Id,
+			Name:  item.Name,
+			Price: item.Price,
+			// get the user info by userID
+			Seller: *user,
+		}
+		itemdetails[i] = detail
+	}
+
+	// unmarshal and response
+	data, err := json.Marshal(itemdetails)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
+}
