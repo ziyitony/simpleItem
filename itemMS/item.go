@@ -5,40 +5,38 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
-
-	"github.com/ziyitony/simpleItem/domain"
 )
 
 const maxLength = 1000
 
 var (
 	itemMutex sync.Mutex
-	itemDB    []*domain.Item
+	itemDB    []*Item
 )
 
 func init() {
-	item1 := &domain.Item{
+	item1 := &Item{
 		Id:       "m001",
 		Name:     "iphone",
 		Price:    50000,
 		SellerId: "u001",
 	}
 
-	item2 := &domain.Item{
+	item2 := &Item{
 		Id:       "m002",
 		Name:     "t-shirt",
 		Price:    2000,
 		SellerId: "u002",
 	}
 
-	item3 := &domain.Item{
+	item3 := &Item{
 		Id:       "m003",
 		Name:     "sofa",
 		Price:    30000,
 		SellerId: "u003",
 	}
 
-	itemDB = []*domain.Item{item1, item2, item3}
+	itemDB = []*Item{item1, item2, item3}
 }
 
 func helloItem(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +47,7 @@ func helloItem(w http.ResponseWriter, r *http.Request) {
 func listOrCreateItem(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
-		var item domain.Item
+		var item Item
 		if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -84,5 +82,5 @@ func listOrCreateItem(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// return domain.ItemDetail as the response
+// return ItemDetail as the response
 func getItemDetail(w http.ResponseWriter, r *http.Request) {}
