@@ -83,4 +83,53 @@ func listOrCreateItem(w http.ResponseWriter, r *http.Request) {
 }
 
 // return ItemDetail as the response
-func getItemDetail(w http.ResponseWriter, r *http.Request) {}
+func getItemDetail(w http.ResponseWriter, r *http.Request) {
+	itemMutex.Lock()
+	defer itemMutex.Unlock()
+
+	itemdetails := make([]*ItemDetail, len(itemDB))
+	// loop item DB
+	for i, item := range itemDB {
+		url := "http://simple-user-ms:44444/userid/" + item.SellerId
+		user, err := getUserById(url, item.SellerId)
+		if err != nil {
+			// return error
+			http.Error(w, "no such seller", http.StatusInternalServerError)
+			return
+		}
+		detail := &ItemDetail{
+			Id:    item.Id,
+			Name:  item.Name,
+			Price: item.Price,
+			// get the user info by userID
+			Seller: *user,
+		}
+		itemdetails[i] = detail
+	}
+
+	// unmarshal and response
+	data, err := json.Marshal(itemdetails)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
+}
+
+func getUserById(url, userID string) (*User, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var user User
+	err = json.NewDecoder(resp.Body).Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}

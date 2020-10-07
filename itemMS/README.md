@@ -15,4 +15,4 @@ _$ docker build -t simple-item-ms ._
 
 * use the image to run
 
-_$ docker run -d -p 55555:55555 --name simple-item-ms simple-item-ms_
+_$ docker run -- link simple-user-ms -d -p 55555:55555 --name simple-item-ms simple-item-ms_
