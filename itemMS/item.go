@@ -109,14 +109,13 @@ func listItemDetail(w http.ResponseWriter, r *http.Request) {
 	itemDetails := make([]*ItemDetail, len(itemDB))
 	for i, item := range itemDB {
 		// HTTP get /userid/{id}
-		resp, err := http.Get("http://localhost:44444/userid/" + item.SellerId)
+		resp, err := http.Get("http://simple-user-ms:44444/userid/" + item.SellerId)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInsufficientStorage)
 			return
 		}
 		defer resp.Body.Close()
 
-		fmt.Println(resp.Body)
 		var user User
 		err = json.NewDecoder(resp.Body).Decode(&user)
 		if err != nil {

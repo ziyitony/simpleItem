@@ -10,8 +10,9 @@ func main() {
 	http.HandleFunc("/itemdetail", listItemDetail)
 
 	http.HandleFunc("/hellouser", helloUser)
-	http.HandleFunc("/users", listOrCreateUser)
 	http.HandleFunc("/userid/", getUserById)
+	print("test")
 
 	http.ListenAndServe(":12345", nil)
+	print("this is a test")
 }
