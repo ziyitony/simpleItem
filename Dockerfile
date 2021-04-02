@@ -1,8 +1,9 @@
 FROM golang:alpine
 
-WORKDIR $GOPATH/src/github.com/ziyitony/simpleItem
-COPY . $GOPATH/src/github.com/ziyitony/simpleItem
-RUN go build -o main
+WORKDIR /go/src/simpleItem
+COPY . .
 
-EXPOSE 12345
-ENTRYPOINT ["./main"]
+RUN go get -d -v ./...
+RUN go install -v ./...
+
+CMD ["simpleItem"]
